@@ -12,10 +12,11 @@ library(directlabels)
 library(tidyverse)
 library(cowplot)
 library(ggridges)
+install.packages("rstudioapi")
 theme_set(theme_cowplot())
-
+removeTheme(cowplot)
 #### READ DATA ----
-setwd("C:\\Documents\\Pyramid_Lake\\RCreations\\RProjects\\PLQWQ_datavis")
+setwd("C:\\RCreations\\RProjects\\Legacy\\WQ_legacy")
 data <-read.csv("PLQWQ_trimmed.csv")
 
 #convert date to usable forms
@@ -151,9 +152,10 @@ SE_depth_temp <- aggregate(tempC ~ depth + month, data, std.error)
 temp_depth <- data.frame(avg_depth_temp, SE_depth_temp)
 
 #plot across months, good code for depth profiles
-
 temp_depth_plot <- ggplot(temp_depth, aes(x=tempC, y=depth)) +
   facet_wrap(~month, labeller=as_labeller(mon_names)) +
+  geom_vline(xintercept=15, linetype="solid", linewidth=1, alpha=0.5, color= "darkslategray4") +
+  geom_vline(xintercept=25, linetype="solid", linewidth=1, alpha=0.5, color= "darkslategray4") +
   geom_point(alpha=0.5) +
   scale_y_reverse()+
   geom_errorbar(aes(xmin=tempC-2*tempC.1, xmax=tempC+2*tempC.1), width=.2, position=position_dodge(0.05), alpha=0.5)+
@@ -161,14 +163,12 @@ temp_depth_plot <- ggplot(temp_depth, aes(x=tempC, y=depth)) +
                      labels = paste(seq(0, 25, by = 5)), 
                      breaks=seq(0, 25, by=5),
                      limits = c(0,25))+
-  geom_vline(xintercept=15, linetype="dashed", size=1, alpha=0.8) +
-  geom_vline(xintercept=23, linetype="dashed", size=1, alpha=0.8) +
-  theme(plot.title = element_text(hjust=0.5), )+
+  theme(plot.title = element_text(hjust=0.5))+
   labs( x= "Mean Temp (C)", y= "Depth (m)") 
 temp_depth_plot
 
 #export
-setwd("C:\\Documents\\Pyramid_Lake\\RCreations\\ROutput")
+setwd("C:\\RCreations\\ROutput\\Temp")
 
 png(filename = "temp_depth_tuirange.png", units = "in", width = 8, height = 6, res=300)
 temp_depth_plot
